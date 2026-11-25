@@ -1,0 +1,57 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>reCAPTCHA v3 Test</title>
+  <script src="https://www.google.com/recaptcha/api.js?render=6LdjKC8uAAAAAExkaiGfQ0dbV0PV4E7WmoN6uDjO"></script>
+</head>
+<body>
+<h2>reCAPTCHA v3 Test</h2>
+
+<button id="generate">Получить токен</button>
+<button id="copy" disabled>Копировать токен</button>
+
+<p id="status"></p>
+<textarea id="result" rows="8" cols="100" readonly></textarea>
+
+<script>
+  const siteKey = '6LdjKC8uAAAAAExkaiGfQ0dbV0PV4E7WmoN6uDjO';
+
+  const generateButton = document.getElementById('generate');
+  const copyButton = document.getElementById('copy');
+  const result = document.getElementById('result');
+  const status = document.getElementById('status');
+
+  generateButton.addEventListener('click', async () => {
+    try {
+      status.textContent = 'Получаем токен...';
+      copyButton.disabled = true;
+
+      await new Promise(resolve => grecaptcha.ready(resolve));
+
+      const token = await grecaptcha.execute(siteKey, {
+        action: 'register'
+      });
+
+      result.value = token;
+      copyButton.disabled = false;
+      status.textContent = 'Токен успешно получен!';
+    } catch (error) {
+      status.textContent = 'Ошибка: ' + error.message;
+    }
+  });
+
+  copyButton.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(result.value);
+      status.textContent = 'Токен скопирован!';
+    } catch (error) {
+      result.select();
+      document.execCommand('copy');
+      status.textContent = 'Токен скопирован!';
+    }
+  });
+</script>
+</body>
+</html>
